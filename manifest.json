@@ -1,0 +1,49 @@
+{
+    "manifest_version":2,
+    "name":"tools",
+    "version":"1.0.3",
+    "description":"简单的google扩展",
+    "icons":{
+        "16":"img/icon.png",
+        "48":"img/icon.png",
+        "128":"img/icon.png"
+    },
+    "background":{
+        "scripts": ["js/background.js"],
+        "persistent": true
+    },
+    "browser_action":{
+        "default_icon": "img/icon.png",
+        "default_title": "个人工具插件",
+        "default_popup": "popup.html"
+    },
+    "content_scripts": 
+    [
+        {
+            "all_frames": false,
+            "matches": ["<all_urls>"],
+            "js": ["js/jquery-2.1.4.min.js","js/content-script.js"],
+            "css": ["css/custom.css"],
+            "run_at": "document_start"
+        }
+    ],
+    "permissions":
+    [
+        "<all_urls>",
+        "contextMenus",
+        "tabs",
+        "notifications",
+        "webRequest",
+        "webRequestBlocking",
+        "storage",
+        "http://*/*",
+        "https://*/*" 
+    ],
+    "web_accessible_resources":["manifest.json","config/*.json","js/inject.js"],
+    "homepage_url":"https://www.baidu.com",
+    "devtools_page":"devtools.html",
+    "omnibox":{"keyword":"go"},
+    "chrome_url_overrides":{
+        "newtab":"newtab.html"
+    }
+}

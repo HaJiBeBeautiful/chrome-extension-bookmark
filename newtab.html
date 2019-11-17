@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>新标签页</title>
+	<meta charset="utf-8"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style>
+	html,body{height: 100%;}
+	body{
+        font-family: 'Microsoft Yahei';
+        margin:0;
+        padding:0;
+        background-image:url(img/bg/preview.jpg);
+        background-repeat: no-repeat;
+        background-size:100% 100%;
+        -moz-background-size:100% 100%;
+    }
+	.center {
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    height: 100%;
+	    font-size: 14px;
+	    color: #CCC;
+	}
+    .center .book-marker .item a{
+        display:-webkit-box;
+        text-overflow:ellipsis;
+        overflow:hidden; 
+        margin-left:4px;
+        margin-top: 4px;
+        -webkit-box-orient:vertical;
+        -webkit-line-clamp:2;
+        color: #2d78f4;
+    }
+    .center .book-marker{
+        width: 860px;
+        height: 500px;
+        margin:18px auto;
+        padding:12px;
+        border-radius: 0.3em;
+        background: #fcfcfc;
+        overflow-y: auto;
+    }
+    .center .book-marker::-webkit-scrollbar{
+        width : 15px;  /*高宽分别对应横竖滚动条的尺寸*/
+        height: 1px;
+    }
+    .center .book-marker::-webkit-scrollbar-thumb{
+        /*滚动条里面小方块*/
+        border-radius   : 10px;
+        background-color: skyblue;
+        background-image: -webkit-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0.2) 75%,
+            transparent 75%,
+            transparent
+        );
+    }
+    .center .book-marker::-webkit-scrollbar-track{
+        /*滚动条里面轨道*/
+        box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background   : #ededed;
+        border-radius: 10px;
+    }
+    .center .book-marker .item{
+        display: inline-block;
+        width: 120px;
+        margin:8px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 0.2em;
+        padding: 7px;
+    }
+    .center .book-marker .item:hover{
+        border: 1px solid #bcbcbc;
+    }
+    .submit-form{
+        overflow: hidden;
+    }
+    .submit-form .form-input{
+        margin-top: 8px;
+    }
+    .submit-form .form-input label{
+        text-align: right;
+    }
+    .btn-box{
+        text-align:center;
+        margin-top: 30px;
+    }
+    </style>
+    <link href="css/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<div class="center">
+        <div class="book-marker">
+            
+        </div>
+    </div>
+    <div style="display: none;" id="editMarker">
+        <div class="submit-form">
+            <input type="hidden" id="key" value="">
+            <div class="form-input row">
+                <label class="col-xs-3">LOGO</label><input id="favIconUrl" value="" class="col-xs-7">
+            </div>
+            <div class="form-input row">
+                <label class="col-xs-3">标题</label><input id="title" value="" class="col-xs-7">
+            </div>
+            <div class="form-input row">
+                <label class="col-xs-3">URL</label><input id="url" value="" class="col-xs-7">
+            </div>
+        </div>
+        <div class="btn-box">
+            <button type="button" id="btnConfirm" class="confirm btn btn-info">确定</button>
+            <button type="button" id="btnCancel" class="cancel btn btn-default">取消</button>
+        </div>
+    </div>
+    <script src="js/jquery-2.1.4.min.js"></script>
+    <script src="js/jquery.ui.position.js"></script>
+    <script src="js/jquery.contextMenu.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/plugin/layer/layer.js"></script>
+    <script src="js/newtab.js"></script>
+</body>
+</html>
