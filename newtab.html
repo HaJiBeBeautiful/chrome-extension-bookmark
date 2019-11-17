@@ -92,14 +92,27 @@
         text-align:center;
         margin-top: 30px;
     }
+    .menu{
+        position: absolute;
+        top: 12px;
+        left: 5px;
+        text-align: center;
+    }
+    .menu a{
+        font-size: 16px;
+        padding: 3px;
+
+    }
     </style>
     <link href="css/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div class="center">
+        <div class="menu">
+            <a href="#" id="addNewBookMarkBtn">添加新书签</a>
+        </div>
         <div class="book-marker">
-            
         </div>
     </div>
     <div style="display: none;" id="editMarker">

@@ -62,8 +62,8 @@ function alertMessage(msg){
 }
 //书签
 function getCollectPageList(data){
-    console.log('getCollectPageList');
-    console.log(data);
+    //console.log('getCollectPageList');
+    //console.log(data);
     if(data){
         data.sort(function(a,b){
             return b.sort - a.sort;
@@ -81,12 +81,22 @@ function getCollectPageList(data){
 //书签信息
 function getMarker(data){
     //console.log(data.favIconUrl);
-    $('#favIconUrl').val(data.favIconUrl);
-    $('#title').val(data.title);
-    $('#url').val(data.url);
-    $('#key').val(data.key);
+    var title = "";
+    if(data){
+        title = "书签修改";
+        $('#favIconUrl').val(data.favIconUrl);
+        $('#title').val(data.title);
+        $('#url').val(data.url);
+        $('#key').val(data.key);
+    }else{
+        title = "书签添加";
+        $('#favIconUrl').val('');
+        $('#title').val('');
+        $('#url').val('');
+        $('#key').val('');
+    }
     layer.open({
-        title:'书签修改',
+        title:title,
         type: 1,
         area: ['420px', '240px'], //宽高
         content: $('#editMarker')
@@ -128,8 +138,12 @@ $(function(){
         var url = $('#url').val();
         var key = $('#key').val();
         chrome.runtime.sendMessage({cmd: 'saveMarker',message:{favIconUrl:favIconUrl,title:title,url:url,key:key}});
-        $item.children('img').attr('src',favIconUrl);
-        $item.children('a').attr('title',title).text(title).attr('href',url);
+        if(key==""){
+            window.location.reload();
+        }else{
+            $item.children('img').attr('src',favIconUrl);
+            $item.children('a').attr('title',title).text(title).attr('href',url);
+        }
         layer.closeAll();
     });
 
@@ -138,6 +152,10 @@ $(function(){
         var _this = this;
         var key = $(_this).parent().attr('key-data');
         chrome.runtime.sendMessage({cmd: 'upSort',message:key});
+    });
+
+    $('#addNewBookMarkBtn').click(function(){
+        chrome.runtime.sendMessage({cmd: 'getMarker',message:''});
     });
 })
 

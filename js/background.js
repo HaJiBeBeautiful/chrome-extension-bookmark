@@ -165,6 +165,8 @@ var fn =  (function(chrome){
                     }
                     if(a>=0){
                         fnObject.sendMessageToContentScript({cmd:"getMarker",message:collectPageArr[a]});
+                    }else{
+                        fnObject.sendMessageToContentScript({cmd:"getMarker",message:''});
                     }
                 }
             });
@@ -187,13 +189,20 @@ var fn =  (function(chrome){
             fnObject.getConfigJsonData(function(data){
                 if(data.hasOwnProperty(pageCollectKey)){
                     var collectPageArr = data[pageCollectKey];
-                    for(var i=0; i<collectPageArr.length; i++){
-                        if(collectPageArr[i].key == marker.key){
-                            collectPageArr[i].title = marker.title;
-                            collectPageArr[i].url = marker.url;
-                            collectPageArr[i].favIconUrl = marker.favIconUrl;
-                            fnObject.setSyncStorage(configKey,data);
-                            break;
+                    if(isNULL(marker.key)){
+                        //添加书签
+                        var key = fnObject.randomString(32);
+                        collectPageArr.push({title:marker.title,url:marker.url,favIconUrl:marker.favIconUrl,key:key,sort:0});
+                        fnObject.setSyncStorage(configKey,data);
+                    }else{
+                        for(var i=0; i<collectPageArr.length; i++){
+                            if(collectPageArr[i].key == marker.key){
+                                collectPageArr[i].title = marker.title;
+                                collectPageArr[i].url = marker.url;
+                                collectPageArr[i].favIconUrl = marker.favIconUrl;
+                                fnObject.setSyncStorage(configKey,data);
+                                break;
+                            }
                         }
                     }
                 }
