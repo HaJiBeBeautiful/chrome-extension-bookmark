@@ -1,6 +1,6 @@
 {
     "manifest_version":2,
-    "name":"tools",
+    "name":"bookmark",
     "version":"1.0.3",
     "description":"简单的google扩展",
     "icons":{
@@ -12,7 +12,7 @@
         "scripts": ["js/background.js"],
         "persistent": true
     },
-    "browser_action":{
+    "browser_action":{ 
         "default_icon": "img/icon.png",
         "default_title": "个人工具插件",
         "default_popup": "popup.html"

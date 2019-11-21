@@ -15,10 +15,11 @@ var fn =  (function(chrome){
 
 
     //配置文件字段
-    var pageCollectKey = "bookmark";
+    var pageCollectKey = "bookmark"; //书签数据
     var overwriteFeild = "overwrite"; // value have 'false' or 'true'
     var modelFeild = "model"; //读取模式 onece 只读一次  everytime每次浏览器启动就重新读一次
     var modelFeildValue = ["onece","everytime"];
+    var bookmarkTypeFeild = "bookmarkType"; //书签类型
     /*---------------------------------全局参数END--------------------------------------------*/
 
     var isNULL = function(str){
@@ -128,10 +129,14 @@ var fn =  (function(chrome){
         if(request.cmd == "getCollectPageList"){
             fnObject.getConfigJsonData(function(data){
                 var bookmarkData = [];
+                var bookmarkTypeFeildData = [];
                 if (data.hasOwnProperty(pageCollectKey)) {
                     bookmarkData = data[pageCollectKey];
                 }
-                fnObject.sendMessageToContentScript({cmd:"getCollectPageList",message:bookmarkData});
+                if (data.hasOwnProperty(bookmarkTypeFeild)) {
+                    bookmarkTypeFeildData = data[bookmarkTypeFeild];
+                }
+                fnObject.sendMessageToContentScript({cmd:"getCollectPageList",message:{data:bookmarkData,type:bookmarkTypeFeildData}});
             });
         }else if(request.cmd == "deleteMarker"){
             //删除书签
@@ -146,7 +151,7 @@ var fn =  (function(chrome){
                             break;
                         }
                     }
-                    fnObject.sendMessageToContentScript({cmd:"getCollectPageList",message:collectPageArr});
+                    //fnObject.sendMessageToContentScript({cmd:"getCollectPageList",message:collectPageArr});
                     //fnObject.BasicNotifications('消息通知','您的书签删除成功');
                 }
             });
@@ -164,6 +169,15 @@ var fn =  (function(chrome){
                         }
                     }
                     if(a>=0){
+                        if (data.hasOwnProperty(bookmarkTypeFeild)) {
+                            var bookmarkTypeFeildData = data[bookmarkTypeFeild];
+                            for(var i=0; i<bookmarkTypeFeildData.length; i++){
+                                if(collectPageArr[a].typeKey == bookmarkTypeFeildData[i].key){
+                                    collectPageArr[a]["typeName"] = bookmarkTypeFeildData[i].name;
+                                    break;
+                                }
+                            }
+                        }
                         fnObject.sendMessageToContentScript({cmd:"getMarker",message:collectPageArr[a]});
                     }else{
                         fnObject.sendMessageToContentScript({cmd:"getMarker",message:''});
@@ -189,10 +203,32 @@ var fn =  (function(chrome){
             fnObject.getConfigJsonData(function(data){
                 if(data.hasOwnProperty(pageCollectKey)){
                     var collectPageArr = data[pageCollectKey];
+                    var newTypeKey = "";
+                    if (data.hasOwnProperty(bookmarkTypeFeild)) {
+                        var bookmarkTypeFeildData = data[bookmarkTypeFeild];
+                        for(var i=0; i<bookmarkTypeFeildData.length; i++){
+                            if(marker.typeName == bookmarkTypeFeildData[i].name){
+                                newTypeKey = bookmarkTypeFeildData[i].key;
+                                break;
+                            }
+                        }
+                        if(isNULL(newTypeKey)){
+                            marker.typeKey = fnObject.randomString(32);
+                            bookmarkTypeFeildData.push({key:marker.typeKey,name:marker.typeName});
+                        }else{
+                            marker.typeKey = newTypeKey;
+                        }
+                    }else{
+                        marker.typeKey = fnObject.randomString(32);
+                        data[bookmarkTypeFeild] = [{key:marker.typeKey,name:marker.typeName}];
+                    }
+                    if(isNULL(marker.favIconUrl)){
+                        marker.favIconUrl = "/img/bookmark.png";
+                    }
                     if(isNULL(marker.key)){
                         //添加书签
                         var key = fnObject.randomString(32);
-                        collectPageArr.push({title:marker.title,url:marker.url,favIconUrl:marker.favIconUrl,key:key,sort:0});
+                        collectPageArr.push({title:marker.title,url:marker.url,favIconUrl:marker.favIconUrl,key:key,sort:0,typeKey:marker.typeKey});
                         fnObject.setSyncStorage(configKey,data);
                     }else{
                         for(var i=0; i<collectPageArr.length; i++){
@@ -200,11 +236,57 @@ var fn =  (function(chrome){
                                 collectPageArr[i].title = marker.title;
                                 collectPageArr[i].url = marker.url;
                                 collectPageArr[i].favIconUrl = marker.favIconUrl;
+                                collectPageArr[i].typeKey = marker.typeKey;
                                 fnObject.setSyncStorage(configKey,data);
                                 break;
                             }
                         }
                     }
+                    fnObject.sendMessageToContentScript({cmd:"refresh"});
+                }
+            });
+        }else if(request.cmd == "deleteMarkerType"){
+            //删除书签分类
+            var key = request.message;
+            fnObject.getConfigJsonData(function(data){
+                if(data.hasOwnProperty(bookmarkTypeFeild)){
+                    var bookmarkTypeFeildData = data[bookmarkTypeFeild];
+                    for(var i=0; i<bookmarkTypeFeildData.length; i++){
+                        if(bookmarkTypeFeildData[i].key == key){
+                            bookmarkTypeFeildData.splice(i,1);
+                            if(data.hasOwnProperty(pageCollectKey)){
+                                var collectPageArr = data[pageCollectKey];
+                                for(var j=collectPageArr.length-1; j>=0; j--){
+                                    if(collectPageArr[j].typeKey == key){
+                                        collectPageArr.splice(j,1);
+                                    }
+                                }
+                            }
+                            fnObject.setSyncStorage(configKey,data);
+                            break;
+                        }
+                    }
+                    fnObject.sendMessageToContentScript({cmd:"refresh"});
+                }
+            });
+        }else if(request.cmd =="saveMarkerType"){
+            var markerType = request.message;
+            fnObject.getConfigJsonData((data)=>{
+                if(data.hasOwnProperty(bookmarkTypeFeild)){
+                    var bookmarkTypeFeildData = data[bookmarkTypeFeild];
+                    if(isNULL(markerType.key)){
+                        var typeKey = fnObject.randomString(32);
+                        bookmarkTypeFeildData.push({key:typeKey,name:markerType.name});
+                    }else{
+                        for(var i=0; i<bookmarkTypeFeildData.length; i++){
+                            if(bookmarkTypeFeildData[i].key == markerType.key){
+                                bookmarkTypeFeildData[i].name = markerType.name;
+                                break;
+                            }
+                        }
+                    }
+                    fnObject.setSyncStorage(configKey,data);
+                    fnObject.sendMessageToContentScript({cmd:"refresh"});
                 }
             });
         }
@@ -270,7 +352,24 @@ var fn =  (function(chrome){
             fnObject.getCurrentTab(tab => {
                 if(!tab.url.startsWith('chrome://')){
                     fnObject.getConfigJsonData(function(data){
+                        var favIconUrl = tab.favIconUrl;
+                        if(!favIconUrl){
+                            favIconUrl = "/img/bookmark.png";
+                        }
                         if(data.hasOwnProperty(pageCollectKey)){
+                            var typeKey = "";
+                            if(data.hasOwnProperty(bookmarkTypeFeild)){
+                                var bookmarkTypeFeildData = data[bookmarkTypeFeild];
+                                if(bookmarkTypeFeildData.length>0){
+                                    typeKey = bookmarkTypeFeildData[0].key;
+                                }else{
+                                    typeKey = fnObject.randomString(32);
+                                    bookmarkTypeFeildData.push({key:typeKey,name:"常用书签"});
+                                }
+                            }else{
+                                typeKey = fnObject.randomString(32);
+                                data[bookmarkTypeFeild] = [{key:typeKey,name:"常用书签"}];
+                            }
                             var collectPageArr = data[pageCollectKey];
                             var collected = false;
                             for(var i=0; i<collectPageArr.length; i++){
@@ -281,13 +380,13 @@ var fn =  (function(chrome){
                             }
                             if(!collected){
                                 var key = fnObject.randomString(32);
-                                collectPageArr.push({title:tab.title,url:tab.url,favIconUrl:tab.favIconUrl,key:key,sort:0});
+                                collectPageArr.push({title:tab.title,url:tab.url,favIconUrl:favIconUrl,key:key,sort:0,typeKey:typeKey});
                                 fnObject.setSyncStorage(configKey,data);
                             }
                         }else{
                             var collectPageArr = new Array();
                             var key = fnObject.randomString(32);
-                            collectPageArr.push({title:tab.title,url:tab.url,favIconUrl:tab.favIconUrl,key:key,sort:0});
+                            collectPageArr.push({title:tab.title,url:tab.url,favIconUrl:favIconUrl,key:key,sort:0,typeKey:typeKey});
                             data[pageCollectKey] = collectPageArr;
                             fnObject.setSyncStorage(configKey,data);
                         }
