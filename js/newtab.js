@@ -42,6 +42,8 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponseParam){
             getCollectPageList(request.message);
         }else if(request.cmd =="getMarker"){
             getMarker(request.message);
+        }else if(request.cmd == "changeBackImage"){
+            changeBackImage(request.message);
         }
 
         if(responseStatus.bCalled){
@@ -49,6 +51,20 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponseParam){
         }    
     }
 });
+
+//换背景图
+function changeBackImage(num){
+    //console.log('num:'+num)
+    if(typeof(num) == "undefined")
+        return;
+    if($('#changeCss'))
+        $('#changeCss').remove();
+    var imgPath = "/img/bg/preview-"+num+".jpg";
+    var s="<style id=\"changeCss\" type='text/css' > body{ background-image:url(\""+imgPath+"\"); } </style>";
+    $("head").append(s);
+}
+chrome.runtime.sendMessage({cmd: 'changeBackImage'});
+
 function handleTestMessage(resp){
     resp("测试发消息233");
 }
@@ -63,8 +79,8 @@ function alertMessage(msg){
 //书签
 var showMenuKey = "";
 function getCollectPageList(data){
-    console.log('getCollectPageList');
-    //console.log(data);
+    if(typeof(data) == "undefined")
+        return;
     var type = data.type;
     var data = data.data;
     data.sort(function(a,b){
@@ -92,7 +108,7 @@ function getCollectPageList(data){
         type = [{"key":1,name:"常用书签"}];
         chrome.runtime.sendMessage({cmd: 'saveMarkerType',message:{"key":'',name:"默认书签"}});
     }
-    console.log(type);
+    //console.log(type);
     $('.mark-content').empty();
     $('.mark-menu').empty();
     for(let j=0; j<type.length; j++){

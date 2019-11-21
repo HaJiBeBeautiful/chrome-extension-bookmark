@@ -270,6 +270,7 @@ var fn =  (function(chrome){
                 }
             });
         }else if(request.cmd =="saveMarkerType"){
+            //保存书签分类
             var markerType = request.message;
             fnObject.getConfigJsonData((data)=>{
                 if(data.hasOwnProperty(bookmarkTypeFeild)){
@@ -287,6 +288,17 @@ var fn =  (function(chrome){
                     }
                     fnObject.setSyncStorage(configKey,data);
                     fnObject.sendMessageToContentScript({cmd:"refresh"});
+                }
+            });
+        }else if(request.cmd =="changeBackImage"){
+            fnObject.getSynStorage("bg_num",(data)=>{
+                if(data.bg_num != undefined && typeof(data.bg_num) == "number"){
+                    fnObject.sendMessageToContentScript({cmd:"changeBackImage",message:data.bg_num});
+                }else{
+                    var num = Math.floor(Math.random(100)*10);
+                    fnObject.setSyncStorage("bg_num",num,()=>{
+                        fnObject.sendMessageToContentScript_all({cmd:"changeBackImage",message:num});
+                    });
                 }
             });
         }
@@ -484,6 +496,14 @@ var fn =  (function(chrome){
             if(callback) callback(tabs.length ? tabs[0]: null);
         });
     }
+    //所有选项卡
+    fnObject.getAllTab = function (callback)
+    {
+        chrome.tabs.query({currentWindow: false}, function(tabs)
+        {
+            if(callback) callback(tabs.length ? tabs: null);
+        });
+    }
 
     // 当前标签打开某个链接
     fnObject.openUrlCurrentTab = function(url)
@@ -493,10 +513,19 @@ var fn =  (function(chrome){
         })
     }
 
-    //发送短期消息到content-js
+    //发送短期消息到content-js 激活的选项卡
     fnObject.sendMessageToContentScript = function(message,callback){
         fnObject.getCurrentTab(tab=>{
             chrome.tabs.sendMessage(tab.id,message,callback);
+        });
+    }
+    fnObject.sendMessageToContentScript_all = function(message,callback){
+        fnObject.getAllTab(tabs=>{
+            if(tabs){
+                tabs.array.forEach(tab => {
+                    chrome.tabs.sendMessage(tab.id,message,callback);
+                });
+            }
         });
     }
     //获取定时器
@@ -556,9 +585,19 @@ var fn =  (function(chrome){
         }
         intervalldArr = [];
     }
+    //定时改变书签页的背景图片
+    function changeNewTabBgImage(){
+        fnObject.setTimeInterval('changeNewTabBgImage',function(){
+            var num = Math.floor(Math.random(100)*10);
+            fnObject.setSyncStorage("bg_num",num,()=>{
+                ffnObject.sendMessageToContentScript_all({cmd:"changeBackImage",message:num});
+            });
+        },8*60*60*1000);
+    }
 
     init();
     sortMarker();
+    changeNewTabBgImage();
 
     return fnObject;
 })(chrome);

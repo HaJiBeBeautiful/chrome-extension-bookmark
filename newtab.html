@@ -13,10 +13,10 @@
         font-family: 'Microsoft Yahei';
         margin:0;
         padding:0;
-        background-image:url(img/bg/preview.jpg);
         background-repeat: no-repeat;
         background-size:100% 100%;
         -moz-background-size:100% 100%;
+        background-position: center;
     }
 	.center {
 	    height: 100%;
@@ -39,8 +39,6 @@
         width: 860px;
         margin:80px auto;
         border-radius: 0.3em;
-        background: #fcfcfc;
-
     }
     .center .book-marker .mark-content::-webkit-scrollbar{
         width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
@@ -75,8 +73,11 @@
         text-align: center;
         border: 1px solid #ddd;
         border-radius: 0.2em;
-        padding: 7px;
+        padding: 7px 7px 7px 7px;
         float: left;
+        background-color: #fff;
+        margin-top: 0px;
+        margin-bottom: 16px;
     }
     .center .book-marker .mark-content .item:hover{
         border: 1px solid #bcbcbc;
@@ -100,7 +101,6 @@
         width: 120px;
         height:600px;
         text-align: center;
-        background-color: #eee;
         display: inline-block;
         overflow-y:auto ;
     }
@@ -135,8 +135,11 @@
         padding: 12px 6px;
         width: 100%;
         border: 1px solid #ddd;
-        border-bottom: none;
         color:#666 !important;
+        border-bottom: none;
+    }
+    .center .book-marker .mark-menu .menu-item:last-child{
+        border-bottom: 1px solid #ddd;
     }
     .center .book-marker .mark-menu .menu-item:hover{
         background-color: #fff;
@@ -145,7 +148,6 @@
         color: #2d78f4 !important;
         font-size: 15px;
         cursor: pointer;
-        border-top: none;
     }
     .center .book-marker .mark-menu .active{
         background-color: #fff;
@@ -166,11 +168,10 @@
     }
     .center .book-marker .mark-content{
         float: right;
-        width: 718px;
+        width: 738px;
         height:600px;
-        background-color: #fff;
         overflow-y: auto;
-        padding-top: 10px;
+        padding-left: 10px;
     }
     .height34{
         height: 34px;

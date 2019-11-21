@@ -32,7 +32,8 @@ $('#action-btn-2').click(function(){
 $('#action-btn-3').click(function(){
     bg.fn.getConfigJsonData((data)=>{
         var text = JSON.stringify(data);
-        download('config.json',text);
+        var nowDate = new Date();
+        download('config'+[nowDate.getFullYear(),nowDate.getMonth()+1,nowDate.getDate()].join('-')+' '+[nowDate.getHours(),nowDate.getMinutes(),nowDate.getSeconds()].join('.')+'.json',text);
     });
 });
 
